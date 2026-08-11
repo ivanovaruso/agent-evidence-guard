@@ -1,0 +1,15 @@
+{
+  "claim": "implementation complete",
+  "authority_ref": "ISSUE-123",
+  "required_evidence": [
+    "tests",
+    "diff"
+  ],
+  "evidence": {
+    "tests": "18 passed",
+    "diff": "commit abc123"
+  },
+  "prohibited_claims": [
+    "production deployed"
+  ]
+}

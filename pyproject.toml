@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-evidence-guard"
+version = "0.1.0"
+description = "Deterministic validation of AI-agent completion claims against evidence and authority requirements."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [{name = "ivanovaruso"}]
+keywords = ["ai-agents", "agent-safety", "evidence", "ci", "guardrails"]
+
+[project.scripts]
+agent-evidence-guard = "agent_evidence_guard.cli:main"
