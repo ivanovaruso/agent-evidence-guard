@@ -69,6 +69,10 @@ A JSON document contains:
 }
 ```
 
+The versioned JSON Schema for this contract is available at [`schemas/input-v1.schema.json`](schemas/input-v1.schema.json). The schema is intentionally strict at the top level so misspelled or unexpected contract fields fail validation in downstream tooling instead of being silently ignored.
+
+The guard itself remains dependency-free: consumers may validate against the schema with any Draft 2020-12 compatible JSON Schema implementation, while the core evaluator continues to use only the Python standard library.
+
 The guard does not decide whether the code is good. It decides whether the **claim is admissible given the declared contract**.
 
 ## Design principles
