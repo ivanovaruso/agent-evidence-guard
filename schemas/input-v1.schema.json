@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ivanovaruso/agent-evidence-guard/blob/main/schemas/input-v1.schema.json",
+  "title": "Agent Evidence Guard Input v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "claim",
+    "authority_ref",
+    "required_evidence",
+    "evidence"
+  ],
+  "properties": {
+    "claim": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Completion or state claim to evaluate."
+    },
+    "authority_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference to the bounded task or authority governing the claim."
+    },
+    "required_evidence": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "prohibited_claims": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": []
+    }
+  }
+}
