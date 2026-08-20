@@ -1,0 +1,65 @@
+name: Bug report
+description: Report reproducible incorrect behavior in Agent Evidence Guard.
+title: "[Bug]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Agent Evidence Guard. Please provide a minimal reproducible case and avoid including secrets or private evidence.
+
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed behavior
+      description: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide the smallest safe input/workflow that reproduces the issue.
+      render: shell
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v0.1.0 or commit SHA
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      options:
+        - Python CLI
+        - GitHub Actions adapter
+        - Reusable GitHub Action
+        - JSON Schema
+        - Packaging / installation
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed secrets, private URLs, customer data, and sensitive evidence from this report.
+          required: true
