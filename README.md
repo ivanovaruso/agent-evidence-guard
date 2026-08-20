@@ -78,6 +78,16 @@ Inside GitHub Actions, the adapter automatically uses `GITHUB_STEP_SUMMARY` when
 
 The adapter is provider-neutral: it does not require Claude, Codex, OpenAI, Anthropic, or any other model provider.
 
+## Maintainer workflow with coding agents
+
+See [`docs/MAINTAINER_AGENT_WORKFLOW.md`](docs/MAINTAINER_AGENT_WORKFLOW.md) for a concrete provider-neutral flow showing how Claude Code, Codex, GitHub Copilot, another coding agent, or a human contributor can produce changes and evidence while Agent Evidence Guard remains a separate deterministic validation layer.
+
+The key boundary is:
+
+```text
+WORKER != EVIDENCE GUARD != MERGE AUTHORITY
+```
+
 ## Input contract
 
 A JSON document contains:
