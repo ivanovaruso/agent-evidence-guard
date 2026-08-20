@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,13 +8,13 @@ version = "0.1.0"
 description = "Deterministic validation of AI-agent completion claims against evidence and authority requirements."
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [{name = "ivanovaruso"}]
 keywords = ["ai-agents", "agent-safety", "evidence", "ci", "guardrails"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
   "Topic :: Software Development :: Quality Assurance",
@@ -29,3 +29,7 @@ Changelog = "https://github.com/ivanovaruso/agent-evidence-guard/blob/main/CHANG
 [project.scripts]
 agent-evidence-guard = "agent_evidence_guard.cli:main"
 agent-evidence-guard-github = "agent_evidence_guard.github_ci:main"
+
+[tool.setuptools]
+packages = ["agent_evidence_guard"]
+include-package-data = false
