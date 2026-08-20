@@ -1,0 +1,28 @@
+name: Agent Evidence Guard
+description: Validate an AI-agent completion claim against explicit authority and evidence requirements.
+author: ivanovaruso
+
+branding:
+  icon: shield
+  color: gray-dark
+
+inputs:
+  input:
+    description: Path to the evidence-contract JSON file in the caller workspace.
+    required: true
+  json-output:
+    description: Optional path for the machine-readable verdict JSON.
+    required: false
+    default: agent-evidence-verdict.json
+
+runs:
+  using: composite
+  steps:
+    - name: Run Agent Evidence Guard
+      shell: bash
+      env:
+        PYTHONPATH: ${{ github.action_path }}
+      run: |
+        python -m agent_evidence_guard.github_ci \
+          "${{ inputs.input }}" \
+          --json-output "${{ inputs.json-output }}"
