@@ -14,3 +14,4 @@ keywords = ["ai-agents", "agent-safety", "evidence", "ci", "guardrails"]
 
 [project.scripts]
 agent-evidence-guard = "agent_evidence_guard.cli:main"
+agent-evidence-guard-github = "agent_evidence_guard.github_ci:main"
