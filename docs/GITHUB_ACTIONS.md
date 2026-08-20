@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Validate completion evidence
-        uses: ivanovaruso/agent-evidence-guard@v0.1.0
+        uses: ivanovaruso/agent-evidence-guard@v0.1.1
         with:
           input: evidence.json
           json-output: guard-verdict.json
@@ -39,9 +39,15 @@ The reusable Action executes the repository's deterministic GitHub adapter and a
 
 For higher-assurance workflows, pin third-party Actions to a full commit SHA according to your organization's supply-chain policy rather than relying only on a mutable version tag.
 
-## CLI integration
+## CLI integration from PyPI
 
-If you prefer to install the package in a Python workflow rather than use the composite Action:
+Install the public distribution:
+
+```bash
+python -m pip install agent-evidence-guard==0.1.1
+```
+
+Then run:
 
 ```bash
 agent-evidence-guard-github evidence.json --json-output guard-verdict.json
