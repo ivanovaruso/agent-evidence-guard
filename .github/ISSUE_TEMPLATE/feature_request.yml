@@ -1,0 +1,36 @@
+name: Feature request
+description: Propose a bounded improvement that preserves evidence-first, provider-neutral behavior.
+title: "[Feature]: "
+labels: []
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What concrete workflow or failure mode would this improve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the smallest useful change.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Is there a way to use, configure, wrap, or compose existing behavior instead?
+
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Project boundaries
+      options:
+        - label: This proposal does not require Agent Evidence Guard to grant merge, deploy, release, spending, or production authority.
+          required: true
+        - label: This proposal can remain provider-neutral at the deterministic core, or clearly explains why not.
+          required: true
