@@ -1,0 +1,7 @@
+* @ivanovaruso
+
+# Distribution and release security-sensitive surfaces
+/.github/workflows/release.yml @ivanovaruso
+/action.yml @ivanovaruso
+/pyproject.toml @ivanovaruso
+/SECURITY.md @ivanovaruso
