@@ -11,6 +11,20 @@ requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
 authors = [{name = "ivanovaruso"}]
 keywords = ["ai-agents", "agent-safety", "evidence", "ci", "guardrails"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.urls]
+Homepage = "https://github.com/ivanovaruso/agent-evidence-guard"
+Repository = "https://github.com/ivanovaruso/agent-evidence-guard"
+Issues = "https://github.com/ivanovaruso/agent-evidence-guard/issues"
+Changelog = "https://github.com/ivanovaruso/agent-evidence-guard/blob/main/CHANGELOG.md"
 
 [project.scripts]
 agent-evidence-guard = "agent_evidence_guard.cli:main"

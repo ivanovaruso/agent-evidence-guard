@@ -1,0 +1,22 @@
+name: reusable-action-smoke
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  supported-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run repository action
+        uses: ./
+        with:
+          input: examples/supported.json
+          json-output: agent-evidence-verdict.json
+      - name: Verify ALLOW verdict artifact
+        shell: bash
+        run: grep -q '"decision": "ALLOW"' agent-evidence-verdict.json

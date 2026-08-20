@@ -52,9 +52,23 @@ Run tests:
 python -m unittest discover -s tests -v
 ```
 
-## GitHub Actions
+## Reusable GitHub Action
 
-A dedicated adapter can emit a GitHub Actions step summary plus a machine-readable verdict artifact while preserving the same fail-closed exit codes:
+Once a release/tag is available, another repository can use Agent Evidence Guard directly:
+
+```yaml
+- name: Validate agent evidence
+  uses: ivanovaruso/agent-evidence-guard@v0.1.0
+  with:
+    input: evidence.json
+    json-output: guard-verdict.json
+```
+
+The Action writes a GitHub Actions step summary, emits a machine-readable verdict file, and preserves the fail-closed exit codes. It does not need an API key or model-provider account.
+
+## GitHub Actions CLI adapter
+
+The underlying adapter can also be invoked directly:
 
 ```bash
 agent-evidence-guard-github evidence.json --json-output guard-verdict.json
