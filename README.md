@@ -52,6 +52,18 @@ Run tests:
 python -m unittest discover -s tests -v
 ```
 
+## GitHub Actions
+
+A dedicated adapter can emit a GitHub Actions step summary plus a machine-readable verdict artifact while preserving the same fail-closed exit codes:
+
+```bash
+agent-evidence-guard-github evidence.json --json-output guard-verdict.json
+```
+
+Inside GitHub Actions, the adapter automatically uses `GITHUB_STEP_SUMMARY` when available. See [`docs/GITHUB_ACTIONS.md`](docs/GITHUB_ACTIONS.md) for a complete workflow example.
+
+The adapter is provider-neutral: it does not require Claude, Codex, OpenAI, Anthropic, or any other model provider.
+
 ## Input contract
 
 A JSON document contains:
