@@ -1,10 +1,10 @@
 # GitHub Actions integration
 
-Agent Evidence Guard can emit both a human-readable GitHub Actions step summary and a machine-readable JSON verdict without changing the provider-neutral deterministic core.
+Agent Evidence Guard can be consumed directly as a reusable GitHub Action. It emits a human-readable GitHub Actions step summary and a machine-readable JSON verdict without changing the provider-neutral deterministic core.
 
-## Example
+## Fastest downstream integration
 
-Assume your workflow or previous step creates `evidence.json`.
+Assume your workflow or a previous step creates `evidence.json`.
 
 ```yaml
 name: evidence-guard
@@ -21,17 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install Agent Evidence Guard
-        run: python -m pip install .
-
       - name: Validate completion evidence
-        run: |
-          agent-evidence-guard-github evidence.json \
-            --json-output guard-verdict.json
+        uses: ivanovaruso/agent-evidence-guard@v0.1.0
+        with:
+          input: evidence.json
+          json-output: guard-verdict.json
 
       - name: Upload verdict artifact
         if: always()
@@ -41,7 +35,17 @@ jobs:
           path: guard-verdict.json
 ```
 
-Inside GitHub Actions, the adapter detects `GITHUB_STEP_SUMMARY` and appends a concise verdict automatically.
+The reusable Action executes the repository's deterministic GitHub adapter and automatically writes to `GITHUB_STEP_SUMMARY` when that environment variable is available.
+
+For higher-assurance workflows, pin third-party Actions to a full commit SHA according to your organization's supply-chain policy rather than relying only on a mutable version tag.
+
+## CLI integration
+
+If you prefer to install the package in a Python workflow rather than use the composite Action:
+
+```bash
+agent-evidence-guard-github evidence.json --json-output guard-verdict.json
+```
 
 ## Exit codes
 
