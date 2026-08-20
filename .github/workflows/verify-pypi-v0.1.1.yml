@@ -27,8 +27,29 @@ jobs:
           print("installed version:", agent_evidence_guard.__version__)
           PY
 
+      - name: Create valid evidence contract
+        run: |
+          cat > evidence.json <<'JSON'
+          {
+            "claim": "post-release smoke test complete",
+            "authority_ref": "PR-15",
+            "required_evidence": ["tests"],
+            "evidence": {"tests": "PyPI clean-install smoke test"},
+            "prohibited_claims": ["production deployed"]
+          }
+          JSON
+
       - name: Smoke-test released CLI
-        run: agent-evidence-guard --help
+        run: agent-evidence-guard evidence.json
 
       - name: Smoke-test released GitHub adapter
-        run: agent-evidence-guard-github --help
+        run: agent-evidence-guard-github evidence.json --json-output guard-verdict.json
+
+      - name: Verify adapter verdict
+        run: |
+          python - <<'PY'
+          import json
+          verdict = json.load(open("guard-verdict.json", encoding="utf-8"))
+          assert verdict["decision"] == "ALLOW", verdict
+          print("adapter decision:", verdict["decision"])
+          PY
