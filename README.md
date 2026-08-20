@@ -31,13 +31,21 @@ Agent Evidence Guard
 ALLOW / BLOCK
 ```
 
-## Quick start
+## Install from PyPI
 
-Requires Python 3.10+ and no third-party runtime dependencies.
+Requires Python 3.10+ and has no third-party runtime dependencies.
 
 ```bash
-python -m agent_evidence_guard.cli examples/supported.json
-python -m agent_evidence_guard.cli examples/unsupported.json
+python -m pip install agent-evidence-guard==0.1.1
+```
+
+The public PyPI distribution has been clean-install verified on GitHub-hosted Python 3.12.
+
+## Quick start
+
+```bash
+agent-evidence-guard examples/supported.json
+agent-evidence-guard examples/unsupported.json
 ```
 
 Exit codes:
@@ -46,7 +54,7 @@ Exit codes:
 - `2` — BLOCK
 - `64` — invalid input
 
-Run tests:
+For source development, run tests with:
 
 ```bash
 python -m unittest discover -s tests -v
@@ -54,17 +62,19 @@ python -m unittest discover -s tests -v
 
 ## Reusable GitHub Action
 
-Once a release/tag is available, another repository can use Agent Evidence Guard directly:
+Another repository can consume the released Action directly:
 
 ```yaml
 - name: Validate agent evidence
-  uses: ivanovaruso/agent-evidence-guard@v0.1.0
+  uses: ivanovaruso/agent-evidence-guard@v0.1.1
   with:
     input: evidence.json
     json-output: guard-verdict.json
 ```
 
 The Action writes a GitHub Actions step summary, emits a machine-readable verdict file, and preserves the fail-closed exit codes. It does not need an API key or model-provider account.
+
+For higher-assurance workflows, pin the Action to the immutable release commit SHA rather than relying only on a mutable version tag.
 
 ## GitHub Actions CLI adapter
 

@@ -43,13 +43,19 @@ A coding agent can produce the PR and supporting evidence, but the repository de
 
 ## GitHub Actions boundary
 
-A repository can run the reusable Action on a pull request:
+A repository can run the released reusable Action on a pull request:
 
 ```yaml
 - name: Validate agent evidence
-  uses: ivanovaruso/agent-evidence-guard@v0.1.0
+  uses: ivanovaruso/agent-evidence-guard@v0.1.1
   with:
     input: evidence.json
+```
+
+Alternatively, install the public PyPI distribution:
+
+```bash
+python -m pip install agent-evidence-guard==0.1.1
 ```
 
 A non-zero result blocks that workflow step. A zero result means only that the declared evidence requirements passed.
