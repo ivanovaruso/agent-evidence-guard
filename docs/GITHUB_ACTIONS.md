@@ -2,6 +2,8 @@
 
 Agent Evidence Guard can be consumed directly as a reusable GitHub Action. It emits a human-readable GitHub Actions step summary and a machine-readable JSON verdict without changing the provider-neutral deterministic core.
 
+**Release availability:** the example pinned to `v0.1.1` uses the older published action and package. The stronger atomic-verdict behavior is in the **unpublished 0.2.0 source candidate**, not in v0.1.1. Do not switch a consumer to `v0.2.0` before the separate authorized publication.
+
 ## Fastest downstream integration
 
 Assume your workflow or a previous step creates `evidence.json`.
@@ -67,7 +69,7 @@ The GitHub adapter publishes the JSON verdict using a same-directory temporary f
 
 **Consume the final step result and the workflow run identity**, not an artifact containing `ALLOW` on its own. The human GitHub step summary is not transactional with the JSON file and may contain a partial or earlier line if an I/O failure occurs. The Action's `0`, `2`, and `64` exit codes are the final signals for that invocation.
 
-- Treat `input`, `json-output`, `--summary-file`, and `GITHUB_STEP_SUMMARY` paths as **trusted workflow configuration**. Do not supply arbitrary untrusted filesystem destinations. Output aliases to the input or to each other are rejected.
+- Treat `input`, `json-output`, `--summary-file`, and `GITHUB_STEP_SUMMARY` paths as **trusted workflow configuration**. Do not supply arbitrary untrusted filesystem destinations. Output aliases to the input and direct aliases between output paths that remain after prior JSON invalidation are rejected. **Hardlink nuance:** if the JSON verdict and Markdown summary were already hardlinks to the same inode, unlinking the old JSON can break that link *before* alias checks, and both destinations can then be written independently. Do not rely on hardlink identity between outputs; choose separate trusted paths from the outset.
 - Use a **unique destination per run and step**. Do not run multiple Guard instances concurrently against the same output path.
 - When using `if: always()` to upload the verdict, the upload is only a diagnostic artifact. It must not grant permission for a failed Guard step or be reused as a fresh verdict by a later run.
 - `ALLOW` means only that **declared** evidence satisfied the contract; it is not independent verification of CI results or authority.
