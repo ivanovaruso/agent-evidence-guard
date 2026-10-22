@@ -1,8 +1,8 @@
-# Agent Evidence Guard 0.2.0 — release candidate (NOT PUBLISHED)
+# Agent Evidence Guard 0.2.0 — release and upgrade record
 
-**Status:** candidate in source control. This document is not a GitHub Release, a PyPI upload, a Marketplace listing, or permission to create any of those artifacts.
+**Status (2026-10-22): PUBLISHED.** [GitHub Release v0.2.0](https://github.com/ivanovaruso/agent-evidence-guard/releases/tag/v0.2.0) and [PyPI 0.2.0](https://pypi.org/project/agent-evidence-guard/0.2.0/) were published from commit `cd29448102cfd3e514a2ddd9ab09d01f5dfd36a3`; the release workflow completed with Trusted Publishing. This document retains the historical pre-publication safety checklist below for audit context.
 
-**Current public installation:** v0.1.1 remains the released PyPI package and GitHub Action tag. Do not substitute `v0.2.0` in a downstream `uses:` declaration, or recommend `pip install agent-evidence-guard==0.2.0` as published, before publication has actually been verified.
+**Current public installation:** PyPI `agent-evidence-guard==0.2.0` and GitHub Action `@v0.2.0` are available. `v0.1.1` remains a historical version and does not include the hardening described here.
 
 ## Purpose and version choice
 
@@ -23,9 +23,9 @@
 2. **Provide schema-shaped evidence.** Unknown top-level keys, malformed values and duplicated JSON keys are not accepted. A nonempty-looking evidence string is *not* independent proof that a check ran.
 3. **Treat paths as trusted.** Verdict and summary output paths must be separate, trustworthy, and unique to the invocation. Never share the same output path across simultaneous runs.
 4. **Use the final step status.** An `ALLOW` artifact or human summary is not an authorization, and JSON/Markdown are not an atomic multi-file transaction. A failed step may leave an ERROR artifact or no artifact.
-5. **Update references only after publication.** The existing `v0.1.1` Action and PyPI wheel remain the released behavior until a separately authorized `v0.2.0` release exists. Pin to a verified commit SHA for high-assurance Action consumers.
+5. **Update verified references.** `v0.2.0` is now the published release. Pin to the verified release commit SHA `cd29448102cfd3e514a2ddd9ab09d01f5dfd36a3` for high-assurance Action consumers.
 
-## Candidate verification checklist
+## Historical pre-publication verification checklist
 
 - [ ] Exact PR head and `main` base SHA inspected before any decision.
 - [ ] All unit/adversarial tests pass on Python 3.10, 3.12, and 3.13.
@@ -39,7 +39,7 @@
 - [ ] Confirm PyPI trusted-publisher environment permissions and release automation ownership. This repository's `.github/workflows/release.yml` triggers when a **GitHub Release is published** and can automatically upload to PyPI.
 - [ ] Once the release actually exists and PyPI install is tested, update README/consumer examples from `0.1.1`/`v0.1.1` to the verified new release and date the changelog entry in a separately reviewed change.
 
-**Stop condition:** Do not create a tag or publish a GitHub Release as a candidate smoke test; doing so could invoke the production PyPI publishing workflow. This document alone does not authorize release.
+**Historical stop condition (satisfied after explicit owner approval):** Publishing a GitHub Release invokes the production PyPI workflow. The approved `v0.2.0` publication has completed; do not recreate the tag, republish this immutable PyPI version, or treat a candidate smoke test as a reason to publish again.
 
 ## Unchanged authority boundary
 
