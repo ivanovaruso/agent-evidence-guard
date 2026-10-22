@@ -4,6 +4,10 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+No additional changes staged.
+
+## [0.2.0] - Pending publication
+
 ### Security and correctness
 - Reject malformed and unexpected contract data at runtime; preserve the existing `BLOCK` decisions for missing or empty claims and authority references.
 - Return `ERROR` / exit 64 for structurally invalid inputs in both CLIs.
@@ -19,6 +23,15 @@ All notable changes to this project will be documented here.
 - Publish verdict JSON via same-directory atomic replacement; invalidate previous verdict on each invocation and prefer an ERROR artifact on write failures.
 - Reject symlink, special-file and aliasing output paths; document non-transactional summary output and final-step status requirements.
 - Add issue #20 regressions for failed sync/replace, stale verdicts, summary failures and reused paths.
+- Fix legacy GitHub Action smoke-workflow YAML and verify the real verdict output on runners.
+
+### Compatibility notes
+- The Python package and composite Action remain dependency-free at runtime and compatible with Python 3.10+.
+- Input contract handling is intentionally stricter than 0.1.1; invalid inputs now produce ERROR/64 in both CLIs. Consumers relying only on codes 0/2 must handle 64.
+- ALLOW validates declared evidence, not GitHub CI authenticity or deployment authority.
+- Existing JSON output paths are invalidated before evaluation and may be absent following unrecoverable I/O failures; always check the final step outcome.
+
+**This 0.2.0 entry is a release candidate, not evidence of a published PyPI version or GitHub release.**
 
 ## [0.1.1] - 2026-08-20
 

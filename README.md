@@ -35,6 +35,8 @@ ALLOW / BLOCK
 
 Requires Python 3.10+ and has no third-party runtime dependencies.
 
+**Currently published distribution: 0.1.1.** The strengthened behavior described later in this README belongs to the source candidate **0.2.0** and is **not available in the 0.1.1 PyPI package or v0.1.1 Action tag** until a separate 0.2.0 release is approved and published. See [0.2.0 release candidate notes](docs/RELEASE_0.2.0_CANDIDATE.md).
+
 ```bash
 python -m pip install agent-evidence-guard==0.1.1
 ```

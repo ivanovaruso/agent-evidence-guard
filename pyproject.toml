@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-evidence-guard"
-version = "0.1.1"
+version = "0.2.0"
 description = "Deterministic validation of AI-agent completion claims against evidence and authority requirements."
 readme = "README.md"
 requires-python = ">=3.10"
