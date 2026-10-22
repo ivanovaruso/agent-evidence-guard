@@ -1,33 +1,28 @@
 """Safe command-line entry point for the declarative evidence guard."""
 
-import argparse
 import json
 from pathlib import Path
 
 from . import __version__
 from .core import evaluate
-
-
-class _UsageParser(argparse.ArgumentParser):
-    def error(self, message: str) -> None:
-        self.print_usage()
-        self.exit(64, f"{self.prog}: error: {message}\n")
+from .json_contract import UsageParser, load_strict_json, render_json
 
 
 def main() -> None:
-    parser = _UsageParser(prog="agent-evidence-guard", description="Check a declared evidence contract (does not verify external facts).")
+    parser = UsageParser(prog="agent-evidence-guard", description="Check a declared evidence contract (does not verify external facts).")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("input", type=Path, help="Path to the input JSON contract")
     args = parser.parse_args()
 
     try:
-        payload = json.loads(args.input.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        print(json.dumps({"decision": "ERROR", "reason": str(exc)}))
+        payload = load_strict_json(args.input)
+        verdict = evaluate(payload)
+        result = render_json(verdict.to_dict())
+    except (OSError, UnicodeError, ValueError, RecursionError) as exc:
+        print(render_json({"decision": "ERROR", "reason": str(exc)}), end="")
         raise SystemExit(64)
 
-    verdict = evaluate(payload)
-    print(json.dumps(verdict.to_dict(), indent=2, sort_keys=True))
+    print(result, end="")
     raise SystemExit({"ALLOW": 0, "BLOCK": 2, "ERROR": 64}[verdict.decision])
 
 
