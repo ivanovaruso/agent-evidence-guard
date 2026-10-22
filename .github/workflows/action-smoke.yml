@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Run repository action
         uses: ./
         with:
@@ -19,4 +22,11 @@ jobs:
           json-output: agent-evidence-verdict.json
       - name: Verify ALLOW verdict artifact
         shell: bash
-        run: grep -q '"decision": "ALLOW"' agent-evidence-verdict.json
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          verdict = json.loads(Path("agent-evidence-verdict.json").read_text(encoding="utf-8"))
+          assert verdict["decision"] == "ALLOW", verdict
+          PY
