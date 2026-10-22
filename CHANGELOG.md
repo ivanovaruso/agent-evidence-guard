@@ -16,6 +16,9 @@ All notable changes to this project will be documented here.
 - Prevent composite Action `input: --help` from bypassing evaluation; treat untrusted input as a literal filename.
 - Normalize adapter argument errors to exit 64; handle invalid output targets without emitting an ALLOW success response.
 - Add reviewer F1–F5 regressions and live GitHub runner checks, including Python 3.10–3.13 compatibility.
+- Publish verdict JSON via same-directory atomic replacement; invalidate previous verdict on each invocation and prefer an ERROR artifact on write failures.
+- Reject symlink, special-file and aliasing output paths; document non-transactional summary output and final-step status requirements.
+- Add issue #20 regressions for failed sync/replace, stale verdicts, summary failures and reused paths.
 
 ## [0.1.1] - 2026-08-20
 
