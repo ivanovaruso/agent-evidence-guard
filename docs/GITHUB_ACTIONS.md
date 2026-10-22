@@ -2,7 +2,7 @@
 
 Agent Evidence Guard can be consumed directly as a reusable GitHub Action. It emits a human-readable GitHub Actions step summary and a machine-readable JSON verdict without changing the provider-neutral deterministic core.
 
-**Release availability:** the example pinned to `v0.1.1` uses the older published action and package. The stronger atomic-verdict behavior is in the **unpublished 0.2.0 source candidate**, not in v0.1.1. Do not switch a consumer to `v0.2.0` before the separate authorized publication.
+**Release availability:** `v0.2.0` is published on [GitHub](https://github.com/ivanovaruso/agent-evidence-guard/releases/tag/v0.2.0) and [PyPI](https://pypi.org/project/agent-evidence-guard/0.2.0/). The older `v0.1.1` release does **not** include the strict JSON or atomic-verdict protections. Consumers upgrading should handle `ERROR` / exit 64.
 
 ## Fastest downstream integration
 
@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Validate completion evidence
-        uses: ivanovaruso/agent-evidence-guard@v0.1.1
+        uses: ivanovaruso/agent-evidence-guard@v0.2.0
         with:
           input: evidence.json
           json-output: guard-verdict.json
@@ -39,14 +39,14 @@ jobs:
 
 The reusable Action executes the repository's deterministic GitHub adapter and automatically writes to `GITHUB_STEP_SUMMARY` when that environment variable is available.
 
-For higher-assurance workflows, pin third-party Actions to a full commit SHA according to your organization's supply-chain policy rather than relying only on a mutable version tag.
+For higher-assurance workflows, pin this Action to the released commit `cd29448102cfd3e514a2ddd9ab09d01f5dfd36a3` according to your organization's supply-chain policy rather than relying only on a mutable version tag.
 
 ## CLI integration from PyPI
 
 Install the public distribution:
 
 ```bash
-python -m pip install agent-evidence-guard==0.1.1
+python -m pip install agent-evidence-guard==0.2.0
 ```
 
 Then run:
