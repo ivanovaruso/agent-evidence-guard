@@ -6,7 +6,7 @@ All notable changes to this project will be documented here.
 
 No additional changes staged.
 
-## [0.2.0] - Pending publication
+## [0.2.0] - 2026-10-22
 
 ### Security and correctness
 - Reject malformed and unexpected contract data at runtime; preserve the existing `BLOCK` decisions for missing or empty claims and authority references.
@@ -31,7 +31,7 @@ No additional changes staged.
 - ALLOW validates declared evidence, not GitHub CI authenticity or deployment authority.
 - Existing JSON output paths are invalidated before evaluation and may be absent following unrecoverable I/O failures; always check the final step outcome.
 
-**This 0.2.0 entry is a release candidate, not evidence of a published PyPI version or GitHub release.**
+Published as [GitHub Release v0.2.0](https://github.com/ivanovaruso/agent-evidence-guard/releases/tag/v0.2.0) and [PyPI agent-evidence-guard 0.2.0](https://pypi.org/project/agent-evidence-guard/0.2.0/) from commit `cd29448102cfd3e514a2ddd9ab09d01f5dfd36a3`.
 
 ## [0.1.1] - 2026-08-20
 
