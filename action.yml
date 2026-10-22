@@ -26,4 +26,4 @@ runs:
         AEG_JSON_OUTPUT_PATH: ${{ inputs.json-output }}
       run: |
         python -I -c 'import sys; sys.path.insert(0, sys.argv.pop(1)); from agent_evidence_guard.github_ci import main; main()' \
-          "$AEG_ACTION_PATH" "$AEG_INPUT_PATH" --json-output "$AEG_JSON_OUTPUT_PATH"
+          "$AEG_ACTION_PATH" "--json-output=$AEG_JSON_OUTPUT_PATH" -- "$AEG_INPUT_PATH"
