@@ -61,6 +61,17 @@ agent-evidence-guard-github evidence.json --json-output guard-verdict.json
 
 A `BLOCK` result intentionally fails the step unless the enclosing workflow explicitly chooses different control flow.
 
+## Verdict artifact consistency
+
+The GitHub adapter publishes the JSON verdict using a same-directory temporary file, `fsync`, and `os.replace` where supported. Existing output verdict files are invalidated **before** the input is evaluated. If the guard cannot publish a new verdict or a later summary write fails, it exits `64` and attempts to write an `ERROR` verdict; on irrecoverable failure the JSON file may be absent. Directories, symlinks, and device files are not supported JSON output destinations.
+
+**Consume the final step result and the workflow run identity**, not an artifact containing `ALLOW` on its own. The human GitHub step summary is not transactional with the JSON file and may contain a partial or earlier line if an I/O failure occurs. The Action's `0`, `2`, and `64` exit codes are the final signals for that invocation.
+
+- Treat `input`, `json-output`, `--summary-file`, and `GITHUB_STEP_SUMMARY` paths as **trusted workflow configuration**. Do not supply arbitrary untrusted filesystem destinations. Output aliases to the input or to each other are rejected.
+- Use a **unique destination per run and step**. Do not run multiple Guard instances concurrently against the same output path.
+- When using `if: always()` to upload the verdict, the upload is only a diagnostic artifact. It must not grant permission for a failed Guard step or be reused as a fresh verdict by a later run.
+- `ALLOW` means only that **declared** evidence satisfied the contract; it is not independent verification of CI results or authority.
+
 ## Authority boundary
 
 An `ALLOW` verdict means only that the declared evidence contract passed. It does **not** authorize merge, release, deployment, spending, production access, or any other state-changing action.
