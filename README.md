@@ -119,6 +119,9 @@ The versioned JSON Schema for this contract is available at [`schemas/input-v1.s
 
 `agent-evidence-guard --help` and `agent-evidence-guard --version` are supported.
 
+CLI JSON parsing rejects duplicate object keys (including nested duplicates), nonstandard values `NaN`/`Infinity`, finite-number overflow, and overly nested JSON with `ERROR` / exit 64. The composite Action treats a filename starting with `-` (for example `--help`) as a literal path, not a command-line option. Use **trusted workflow configuration** for verdict and summary output paths; the two output files are not a transactional unit. IO failures produce an error exit rather than claiming success on stdout.
+
+
 **Security and trust limit:** `ALLOW` checks only the declared contract. A text value such as `"tests": "9999 passed"` is not proof that CI ran; an `authority_ref` value is not independently authenticated. The guard never authorizes merge, release, deployment or access.
 
 The guard does not decide whether the code is good. It decides whether the **claim is admissible given the declared contract**.
