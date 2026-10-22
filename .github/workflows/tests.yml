@@ -42,6 +42,30 @@ jobs:
         run: agent-evidence-guard examples/supported.json
       - name: Smoke-test installed GitHub adapter
         run: agent-evidence-guard-github examples/supported.json --json-output /tmp/guard-verdict.json
+      - name: Verify installed wheel and CLI version matches source
+        shell: bash
+        run: |
+          EXPECTED="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          (
+            cd /tmp
+            ACTUAL="$(python -c 'from importlib.metadata import version; print(version("agent-evidence-guard"))')"
+            test "$ACTUAL" = "$EXPECTED"
+            python -c 'from importlib.metadata import version; from agent_evidence_guard import __version__; assert __version__ == version("agent-evidence-guard")'
+            test "$(agent-evidence-guard --version)" = "agent-evidence-guard $EXPECTED"
+          )
+      - name: Prepare candidate distribution checksums
+        shell: bash
+        run: |
+          cd dist
+          sha256sum *.whl *.tar.gz > SHA256SUMS
+          sha256sum -c SHA256SUMS
+      - name: Archive built distribution for inspection (not a release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-evidence-guard-candidate-${{ github.run_id }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
 
   action-consumer:
     name: Composite Action smoke test on GitHub runner
