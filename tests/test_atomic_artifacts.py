@@ -4,6 +4,8 @@ import contextlib
 import io
 import json
 import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -166,7 +168,7 @@ class AtomicArtifactsTests(unittest.TestCase):
         code, stdout = self.invoke(summary_file=self.output)
         self.assertEqual(code, 64)
         self.assertEqual(stdout["decision"], "ERROR")
-        self.assertFalse(self.output.exists())
+        self.assertEqual(self.artifact()["decision"], "ERROR")
 
     def test_directory_destination_does_not_produce_allow(self):
         stdout = io.StringIO()
@@ -194,6 +196,96 @@ class AtomicArtifactsTests(unittest.TestCase):
             code = run(self.input, summary_file=self.summary, json_output=special)
         self.assertEqual(code, 64)
         self.assertEqual(json.loads(stdout.getvalue())["decision"], "ERROR")
+        self.assertFalse(self.summary.exists())
+
+    def test_f1_circular_symlink_as_json_output_returns_error64(self):
+        self.output.symlink_to(self.output)
+        code, stdout = self.invoke()
+        self.assertEqual(code, 64)
+        self.assertEqual(stdout["decision"], "ERROR")
+        self.assertTrue(self.output.is_symlink())
+        self.assert_no_temp_files()
+
+    def test_f1_circular_symlink_as_summary_returns_error64(self):
+        self.summary.symlink_to(self.summary)
+        self.output.write_text('{"decision":"ALLOW","old":true}')
+        code, stdout = self.invoke(summary_file=self.summary)
+        self.assertEqual(code, 64)
+        self.assertEqual(stdout["decision"], "ERROR")
+        self.assertEqual(self.artifact()["decision"], "ERROR")
+        self.assertNotIn("old", self.artifact())
+        self.assertTrue(self.summary.is_symlink())
+        self.assert_no_temp_files()
+
+    def test_f1_circular_symlink_as_input_returns_error64(self):
+        self.input.unlink()
+        self.input.symlink_to(self.input)
+        self.output.write_text('{"decision":"ALLOW","old":true}')
+        code, stdout = self.invoke()
+        self.assertEqual(code, 64)
+        self.assertEqual(stdout["decision"], "ERROR")
+        self.assertEqual(self.artifact()["decision"], "ERROR")
+        self.assertTrue(self.input.is_symlink())
+        self.assert_no_temp_files()
+
+    def test_f1_runtimeerror_during_path_resolve_never_escapes(self):
+        # Python 3.10-3.12 can raise RuntimeError while resolving a loop.
+        # Test the compatibility branch on a runner that handles it differently.
+        with patch("pathlib.Path.resolve", side_effect=RuntimeError("symlink loop")):
+            code, stdout = self.invoke(summary_file=self.summary)
+        self.assertEqual(code, 0)
+        self.assertEqual(stdout["decision"], "ALLOW")
+        self.assertEqual(self.artifact()["decision"], "ALLOW")
+
+    def test_f1_circular_paths_cli_no_traceback(self):
+        for target in ("input", "output", "summary"):
+            with self.subTest(target=target), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                source = root / "input.json"
+                source.write_text(json.dumps(VALID))
+                json_dest = root / "output.json"
+                summary = root / "summary.md"
+                dest = {"input": source, "output": json_dest, "summary": summary}[target]
+                dest.unlink(missing_ok=True)
+                dest.symlink_to(dest)
+                process = subprocess.run(
+                    [sys.executable, "-m", "agent_evidence_guard.github_ci", str(source),
+                     "--json-output", str(json_dest), "--summary-file", str(summary)],
+                    capture_output=True, text=True,
+                )
+                self.assertEqual(process.returncode, 64, process.stderr)
+                self.assertEqual(json.loads(process.stdout)["decision"], "ERROR")
+                self.assertNotIn("Traceback", process.stderr)
+
+    def test_f2_summary_same_as_input_invalidates_old_allow(self):
+        self.output.write_text('{"decision":"ALLOW","old":true}')
+        original = self.input.read_text()
+        code, stdout = self.invoke(summary_file=self.input)
+        self.assertEqual(code, 64)
+        self.assertEqual(stdout["decision"], "ERROR")
+        self.assertEqual(self.input.read_text(), original)
+        self.assertEqual(self.artifact()["decision"], "ERROR")
+        self.assertNotIn("old", self.artifact())
+        self.assert_no_temp_files()
+
+    def test_f2_hardlinked_summary_input_invalidates_old_allow(self):
+        self.summary.hardlink_to(self.input)
+        self.output.write_text('{"decision":"ALLOW","old":true}')
+        original = self.input.read_text()
+        code, stdout = self.invoke(summary_file=self.summary)
+        self.assertEqual(code, 64)
+        self.assertEqual(stdout["decision"], "ERROR")
+        self.assertEqual(self.input.read_text(), original)
+        self.assertEqual(self.artifact()["decision"], "ERROR")
+
+    def test_f2_json_alias_input_protected_without_mutation(self):
+        original = self.input.read_text()
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            status = run(self.input, summary_file=self.summary, json_output=self.input)
+        self.assertEqual(status, 64)
+        self.assertEqual(json.loads(output.getvalue())["decision"], "ERROR")
+        self.assertEqual(self.input.read_text(), original)
         self.assertFalse(self.summary.exists())
 
     def test_block_contract_summary_and_artifact_are_consistent(self):
