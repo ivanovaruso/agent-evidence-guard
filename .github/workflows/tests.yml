@@ -9,12 +9,17 @@ permissions:
 
 jobs:
   test:
+    name: Unit tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
       - run: python -m unittest discover -s tests -v
 
   package:
@@ -37,3 +42,128 @@ jobs:
         run: agent-evidence-guard examples/supported.json
       - name: Smoke-test installed GitHub adapter
         run: agent-evidence-guard-github examples/supported.json --json-output /tmp/guard-verdict.json
+
+  action-consumer:
+    name: Composite Action smoke test on GitHub runner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Call action (expected ALLOW)
+        uses: ./
+        with:
+          input: examples/supported.json
+          json-output: ${{ runner.temp }}/aeg-allow.json
+
+      - name: Verify ALLOW artifact
+        env:
+          AEG_VERDICT_PATH: ${{ runner.temp }}/aeg-allow.json
+        run: |
+          python - <<'PY'
+          import json, os
+          with open(os.environ["AEG_VERDICT_PATH"], encoding="utf-8") as fp:
+              verdict = json.load(fp)
+          assert verdict["decision"] == "ALLOW", verdict
+          PY
+
+      - name: Call action (expected BLOCK)
+        id: block
+        continue-on-error: true
+        uses: ./
+        with:
+          input: examples/unsupported.json
+          json-output: ${{ runner.temp }}/aeg-block.json
+
+      - name: Verify BLOCK artifact and failed step
+        env:
+          AEG_BLOCK_OUTCOME: ${{ steps.block.outcome }}
+          AEG_VERDICT_PATH: ${{ runner.temp }}/aeg-block.json
+        run: |
+          python - <<'PY'
+          import json, os
+          assert os.environ["AEG_BLOCK_OUTCOME"] == "failure"
+          with open(os.environ["AEG_VERDICT_PATH"], encoding="utf-8") as fp:
+              verdict = json.load(fp)
+          assert verdict["decision"] == "BLOCK", verdict
+          assert "missing_evidence:tests" in verdict["reasons"], verdict
+          PY
+
+      - name: Call action (untrusted literal input path)
+        id: injection
+        continue-on-error: true
+        uses: ./
+        with:
+          input: '$(touch "$RUNNER_TEMP/aeg-shell-injection-sentinel")'
+          json-output: ${{ runner.temp }}/aeg-error.json
+
+      - name: Verify path not executed and ERROR artifact
+        env:
+          AEG_INJECTION_OUTCOME: ${{ steps.injection.outcome }}
+          AEG_VERDICT_PATH: ${{ runner.temp }}/aeg-error.json
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          assert os.environ["AEG_INJECTION_OUTCOME"] == "failure"
+          marker = pathlib.Path(os.environ["RUNNER_TEMP"]) / "aeg-shell-injection-sentinel"
+          assert not marker.exists(), "Untrusted Action input was interpreted as shell code"
+          with open(os.environ["AEG_VERDICT_PATH"], encoding="utf-8") as fp:
+              verdict = json.load(fp)
+          assert verdict["decision"] == "ERROR", verdict
+          PY
+
+      - name: Call action (help-like input must not skip evaluation)
+        id: option_bypass
+        continue-on-error: true
+        uses: ./
+        with:
+          input: --help
+          json-output: ${{ runner.temp }}/aeg-help-path.json
+
+      - name: Verify help-like input fails and produces ERROR
+        env:
+          AEG_STEP_OUTCOME: ${{ steps.option_bypass.outcome }}
+          AEG_VERDICT_PATH: ${{ runner.temp }}/aeg-help-path.json
+        run: |
+          python - <<'PY'
+          import json, os
+          assert os.environ["AEG_STEP_OUTCOME"] == "failure"
+          with open(os.environ["AEG_VERDICT_PATH"], encoding="utf-8") as fp:
+              verdict = json.load(fp)
+          assert verdict["decision"] == "ERROR", verdict
+          PY
+
+      - name: Create non-standard JSON evidence
+        env:
+          AEG_INVALID_PATH: ${{ runner.temp }}/aeg-nan.json
+        run: |
+          python - <<'PY'
+          import os, pathlib
+          pathlib.Path(os.environ["AEG_INVALID_PATH"]).write_text(
+              '{"claim":"done","authority_ref":"x","required_evidence":["tests"],"evidence":{"tests":NaN}}',
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Call action (NaN JSON must fail)
+        id: nan_contract
+        continue-on-error: true
+        uses: ./
+        with:
+          input: ${{ runner.temp }}/aeg-nan.json
+          json-output: ${{ runner.temp }}/aeg-nan-verdict.json
+
+      - name: Verify nonstandard JSON rejected with ERROR
+        env:
+          AEG_STEP_OUTCOME: ${{ steps.nan_contract.outcome }}
+          AEG_VERDICT_PATH: ${{ runner.temp }}/aeg-nan-verdict.json
+        run: |
+          python - <<'PY'
+          import json, os
+          assert os.environ["AEG_STEP_OUTCOME"] == "failure"
+          with open(os.environ["AEG_VERDICT_PATH"], encoding="utf-8") as fp:
+              verdict = json.load(fp)
+          assert verdict["decision"] == "ERROR", verdict
+          PY

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented here.
 
+## [Unreleased]
+
+### Security and correctness
+- Reject malformed and unexpected contract data at runtime; preserve the existing `BLOCK` decisions for missing or empty claims and authority references.
+- Return `ERROR` / exit 64 for structurally invalid inputs in both CLIs.
+- Pass composite Action inputs through environment variables and load the Action's own Python package with isolated interpreter startup.
+- Normalize repeated whitespace and case when checking prohibited phrases; this does not make string matching a semantic security policy.
+- Add negative and local composite-action regression tests for shell injection and repository package shadowing.
+- Support `--help` and `--version` in the primary CLI.
+- Clarify that declared evidence is not independently verified.
+- Reject duplicate JSON keys, NaN/Infinity, overflowing float literals, and excessive nesting in both CLIs.
+- Prevent composite Action `input: --help` from bypassing evaluation; treat untrusted input as a literal filename.
+- Normalize adapter argument errors to exit 64; handle invalid output targets without emitting an ALLOW success response.
+- Add reviewer F1–F5 regressions and live GitHub runner checks, including Python 3.10–3.13 compatibility.
+
 ## [0.1.1] - 2026-08-20
 
 ### Added

@@ -115,9 +115,14 @@ A JSON document contains:
 }
 ```
 
-The versioned JSON Schema for this contract is available at [`schemas/input-v1.schema.json`](schemas/input-v1.schema.json). The schema is intentionally strict at the top level so misspelled or unexpected contract fields fail validation in downstream tooling instead of being silently ignored.
+The versioned JSON Schema for this contract is available at [`schemas/input-v1.schema.json`](schemas/input-v1.schema.json). The core now rejects structurally invalid contract values at runtime using only the Python standard library; unknown top-level fields, invalid field types and duplicate evidence names produce `ERROR` (exit 64). Missing or empty claim and authority references retain `BLOCK` (exit 2) for compatibility with existing consumers. A separate JSON Schema validator is optional.
 
-The guard itself remains dependency-free: consumers may validate against the schema with any Draft 2020-12 compatible JSON Schema implementation, while the core evaluator continues to use only the Python standard library.
+`agent-evidence-guard --help` and `agent-evidence-guard --version` are supported.
+
+CLI JSON parsing rejects duplicate object keys (including nested duplicates), nonstandard values `NaN`/`Infinity`, finite-number overflow, and overly nested JSON with `ERROR` / exit 64. The composite Action treats a filename starting with `-` (for example `--help`) as a literal path, not a command-line option. Use **trusted workflow configuration** for verdict and summary output paths; the two output files are not a transactional unit. IO failures produce an error exit rather than claiming success on stdout.
+
+
+**Security and trust limit:** `ALLOW` checks only the declared contract. A text value such as `"tests": "9999 passed"` is not proof that CI ran; an `authority_ref` value is not independently authenticated. The guard never authorizes merge, release, deployment or access.
 
 The guard does not decide whether the code is good. It decides whether the **claim is admissible given the declared contract**.
 

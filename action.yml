@@ -1,5 +1,5 @@
 name: Agent Evidence Guard
-description: Validate an AI-agent completion claim against explicit authority and evidence requirements.
+description: Validate an AI-agent completion claim against declared evidence requirements.
 author: ivanovaruso
 
 branding:
@@ -21,8 +21,9 @@ runs:
     - name: Run Agent Evidence Guard
       shell: bash
       env:
-        PYTHONPATH: ${{ github.action_path }}
+        AEG_ACTION_PATH: ${{ github.action_path }}
+        AEG_INPUT_PATH: ${{ inputs.input }}
+        AEG_JSON_OUTPUT_PATH: ${{ inputs.json-output }}
       run: |
-        python -m agent_evidence_guard.github_ci \
-          "${{ inputs.input }}" \
-          --json-output "${{ inputs.json-output }}"
+        python -I -c 'import sys; sys.path.insert(0, sys.argv.pop(1)); from agent_evidence_guard.github_ci import main; main()' \
+          "$AEG_ACTION_PATH" "--json-output=$AEG_JSON_OUTPUT_PATH" -- "$AEG_INPUT_PATH"
