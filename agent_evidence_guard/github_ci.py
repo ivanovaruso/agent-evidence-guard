@@ -20,7 +20,7 @@ def render_summary(verdict: Verdict, input_path: str) -> str:
         lines.extend(["", "### Reasons"])
         lines.extend(f"- `{reason}`" for reason in verdict.reasons)
     else:
-        lines.extend(["", "All required evidence and authority checks passed."])
+        lines.extend(["", "All declared evidence contract checks passed (external facts not verified)."])
 
     lines.extend(
         [
@@ -78,7 +78,7 @@ def run(input_path: Path, summary_file: Path | None = None, json_output: Path | 
             append=summary_file is None and github_summary is not None,
         )
 
-    return 0 if verdict.decision == "ALLOW" else 2
+    return {"ALLOW": 0, "BLOCK": 2, "ERROR": 64}[verdict.decision]
 
 
 def main() -> None:
