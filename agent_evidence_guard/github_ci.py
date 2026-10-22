@@ -82,11 +82,17 @@ def _write_summary(path: Path, summary: str, append: bool) -> None:
 
 def _same_destination(a: Path, b: Path) -> bool:
     """Detect identical paths, symlink aliases and existing hardlinks."""
-    if a.resolve() == b.resolve():
-        return True
+    try:
+        if a.resolve() == b.resolve():
+            return True
+    except RuntimeError:
+        # Python 3.10-3.12 may raise RuntimeError for circular symlinks.
+        # Such paths are unusable: input opening or output lstat will reject
+        # them below. Do not leak an uncaught traceback during alias checks.
+        pass
     try:
         return a.samefile(b)
-    except OSError:
+    except (OSError, RuntimeError):
         return False
 
 
@@ -105,12 +111,15 @@ def run(input_path: Path, summary_file: Path | None = None, json_output: Path | 
     try:
         github_summary = os.environ.get("GITHUB_STEP_SUMMARY")
         summary_target = summary_file or (Path(github_summary) if github_summary else None)
-        _reject_aliases(input_path, json_output, summary_target)
+        # Protect the input contract *before* invalidating any output. All
+        # other configuration errors must be checked *after* the previous
+        # machine verdict has been removed, so an old ALLOW cannot survive.
+        if json_output is not None and _same_destination(json_output, input_path):
+            raise ValueError("JSON output must not overwrite the input contract")
         if json_output is not None:
-            # Do this before parsing the input: a failed invocation must not
-            # accidentally expose an ALLOW artifact from an earlier run.
             _remove_old_verdict(json_output)
             artifact_ready = True
+        _reject_aliases(input_path, json_output, summary_target)
         if summary_target is not None:
             _validate_output_destination(summary_target)
 
