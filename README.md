@@ -35,13 +35,13 @@ ALLOW / BLOCK
 
 Requires Python 3.10+ and has no third-party runtime dependencies.
 
-**Currently published distribution: 0.1.1.** The strengthened behavior described later in this README belongs to the source candidate **0.2.0** and is **not available in the 0.1.1 PyPI package or v0.1.1 Action tag** until a separate 0.2.0 release is approved and published. See [0.2.0 release candidate notes](docs/RELEASE_0.2.0_CANDIDATE.md).
+**Latest published version: 0.2.0** (2026-10-22). This release contains stricter contract validation, safer GitHub Action input handling and more robust JSON verdict publication. Consumers upgrading from 0.1.1 must handle `ERROR` / exit 64 for invalid inputs. See the [0.2.0 release record](docs/RELEASE_0.2.0_CANDIDATE.md) and [GitHub Release](https://github.com/ivanovaruso/agent-evidence-guard/releases/tag/v0.2.0).
 
 ```bash
-python -m pip install agent-evidence-guard==0.1.1
+python -m pip install agent-evidence-guard==0.2.0
 ```
 
-The public PyPI distribution has been clean-install verified on GitHub-hosted Python 3.12.
+Version 0.2.0 was built and published by GitHub Actions through PyPI Trusted Publishing. An isolated installation from PyPI was smoke-tested with `ALLOW/0`, `BLOCK/2` and `ERROR/64`.
 
 ## Quick start
 
@@ -68,7 +68,7 @@ Another repository can consume the released Action directly:
 
 ```yaml
 - name: Validate agent evidence
-  uses: ivanovaruso/agent-evidence-guard@v0.1.1
+  uses: ivanovaruso/agent-evidence-guard@v0.2.0
   with:
     input: evidence.json
     json-output: guard-verdict.json
