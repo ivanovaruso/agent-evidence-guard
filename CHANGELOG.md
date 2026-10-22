@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Security and correctness
+- Reject malformed and unexpected contract data at runtime; preserve the existing `BLOCK` decisions for missing or empty claims and authority references.
+- Return `ERROR` / exit 64 for structurally invalid inputs in both CLIs.
+- Pass composite Action inputs through environment variables and load the Action's own Python package with isolated interpreter startup.
+- Normalize repeated whitespace and case when checking prohibited phrases; this does not make string matching a semantic security policy.
+- Add negative and local composite-action regression tests for shell injection and repository package shadowing.
+- Support `--help` and `--version` in the primary CLI.
+- Clarify that declared evidence is not independently verified.
+
 All notable changes to this project will be documented here.
 
 ## [0.1.1] - 2026-08-20
