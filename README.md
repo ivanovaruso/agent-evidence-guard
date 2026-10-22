@@ -122,6 +122,8 @@ The versioned JSON Schema for this contract is available at [`schemas/input-v1.s
 CLI JSON parsing rejects duplicate object keys (including nested duplicates), nonstandard values `NaN`/`Infinity`, finite-number overflow, and overly nested JSON with `ERROR` / exit 64. The composite Action treats a filename starting with `-` (for example `--help`) as a literal path, not a command-line option. Use **trusted workflow configuration** for verdict and summary output paths; the two output files are not a transactional unit. IO failures produce an error exit rather than claiming success on stdout.
 
 
+**Artifact publication:** The GitHub CI adapter writes a machine-readable verdict through a same-directory temporary file and atomic replacement where the filesystem supports it, after flushing and syncing the temporary file. An existing verdict at the configured output path is removed at the start of each invocation to reduce stale `ALLOW` artifacts. Existing symlinks, directories, and special-file destinations are rejected. A file may be absent after an unrecoverable I/O error; consumers **must check the final step exit status** and the originating workflow run, not an artifact or GitHub step summary in isolation. JSON and Markdown summary updates are not a multi-file transaction. Use a unique, trusted output path per invocation.
+
 **Security and trust limit:** `ALLOW` checks only the declared contract. A text value such as `"tests": "9999 passed"` is not proof that CI ran; an `authority_ref` value is not independently authenticated. The guard never authorizes merge, release, deployment or access.
 
 The guard does not decide whether the code is good. It decides whether the **claim is admissible given the declared contract**.
