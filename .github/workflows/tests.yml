@@ -113,3 +113,57 @@ jobs:
               verdict = json.load(fp)
           assert verdict["decision"] == "ERROR", verdict
           PY
+
+      - name: Call action (help-like input must not skip evaluation)
+        id: option_bypass
+        continue-on-error: true
+        uses: ./
+        with:
+          input: --help
+          json-output: ${{ runner.temp }}/aeg-help-path.json
+
+      - name: Verify help-like input fails and produces ERROR
+        env:
+          AEG_STEP_OUTCOME: ${{ steps.option_bypass.outcome }}
+          AEG_VERDICT_PATH: ${{ runner.temp }}/aeg-help-path.json
+        run: |
+          python - <<'PY'
+          import json, os
+          assert os.environ["AEG_STEP_OUTCOME"] == "failure"
+          with open(os.environ["AEG_VERDICT_PATH"], encoding="utf-8") as fp:
+              verdict = json.load(fp)
+          assert verdict["decision"] == "ERROR", verdict
+          PY
+
+      - name: Create non-standard JSON evidence
+        env:
+          AEG_INVALID_PATH: ${{ runner.temp }}/aeg-nan.json
+        run: |
+          python - <<'PY'
+          import os, pathlib
+          pathlib.Path(os.environ["AEG_INVALID_PATH"]).write_text(
+              '{"claim":"done","authority_ref":"x","required_evidence":["tests"],"evidence":{"tests":NaN}}',
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Call action (NaN JSON must fail)
+        id: nan_contract
+        continue-on-error: true
+        uses: ./
+        with:
+          input: ${{ runner.temp }}/aeg-nan.json
+          json-output: ${{ runner.temp }}/aeg-nan-verdict.json
+
+      - name: Verify nonstandard JSON rejected with ERROR
+        env:
+          AEG_STEP_OUTCOME: ${{ steps.nan_contract.outcome }}
+          AEG_VERDICT_PATH: ${{ runner.temp }}/aeg-nan-verdict.json
+        run: |
+          python - <<'PY'
+          import json, os
+          assert os.environ["AEG_STEP_OUTCOME"] == "failure"
+          with open(os.environ["AEG_VERDICT_PATH"], encoding="utf-8") as fp:
+              verdict = json.load(fp)
+          assert verdict["decision"] == "ERROR", verdict
+          PY
