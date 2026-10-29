@@ -60,7 +60,7 @@ jobs:
           sha256sum *.whl *.tar.gz > SHA256SUMS
           sha256sum -c SHA256SUMS
       - name: Archive built distribution for inspection (not a release)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: agent-evidence-guard-candidate-${{ github.run_id }}
           path: dist/
